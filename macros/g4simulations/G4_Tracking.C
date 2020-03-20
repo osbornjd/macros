@@ -4,7 +4,6 @@
 
 #include <fun4all/Fun4AllServer.h>
 
-#include <g4eval/TrkrEvaluator.h>
 #include <g4eval/SvtxEvaluator.h>
 
 #include <g4intt/PHG4InttDefs.h>
@@ -49,7 +48,7 @@ R__LOAD_LIBRARY(libintt.so)
 R__LOAD_LIBRARY(libmvtx.so)
 R__LOAD_LIBRARY(libtpc.so)
 R__LOAD_LIBRARY(libtrack_reco.so)
-//R__LOAD_LIBRARY(libg4hough.so)
+
 #endif
 
 #include <vector>
