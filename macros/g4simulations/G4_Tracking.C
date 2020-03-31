@@ -31,6 +31,8 @@
 
 #include <trackreco/PHGenFitTrkFitter.h>
 #include <trackreco/PHActsTrkFitter.h>
+#include <trackreco/PHActsSourceLinks.h>
+#include <trackreco/PHActsTracks.h>
 #include <trackreco/PHGenFitTrkProp.h>
 #include <trackreco/PHHoughSeeding.h>
 #include <trackreco/PHInitZVertexing.h>
@@ -553,11 +555,19 @@ void Tracking_Reco(int verbosity = 0)
   //------------------------------------------------
   // Fitting of tracks using Kalman Filter
   //------------------------------------------------
+  PHActsSourceLinks *srcLinks = new PHActsSourceLinks();
+  srcLinks->Verbosity(0);
+  se->registerSubsystem(srcLinks);
 
+  PHActsTracks *actsTracks = new PHActsTracks();
+  actsTracks->Verbosity(0);
+  se->registerSubsystem(actsTracks);
+
+  
   PHActsTrkFitter *actsfit = new PHActsTrkFitter();
   actsfit->Verbosity(20);
   se->registerSubsystem(actsfit);
-
+  
 
   PHGenFitTrkFitter* kalman = new PHGenFitTrkFitter();
   kalman->Verbosity(0);
