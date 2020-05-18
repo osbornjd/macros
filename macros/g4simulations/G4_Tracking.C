@@ -488,11 +488,9 @@ void Tracking_Reco(int verbosity = 0)
 
   Fun4AllServer* se = Fun4AllServer::instance();
 
-  
-  
-   PHActsSourceLinks *srcLinks = new PHActsSourceLinks();
-   srcLinks->Verbosity(30);
-   se->registerSubsystem(srcLinks);
+  PHActsSourceLinks *srcLinks = new PHActsSourceLinks();
+  srcLinks->Verbosity(0);
+  se->registerSubsystem(srcLinks);
 
 
   //-------------
@@ -535,11 +533,8 @@ void Tracking_Reco(int verbosity = 0)
       // Find all clusters associated with each seed track
       PHGenFitTrkProp* track_prop = new PHGenFitTrkProp("PHGenFitTrkProp", n_maps_layer, n_intt_layer, n_gas_layer);
       track_prop->Verbosity(0);
-      //se->registerSubsystem(track_prop);
+      se->registerSubsystem(track_prop);
       
-
-
-
       for(int i = 0;i<n_intt_layer;i++)
 	{
 	  // strip length is along theta
@@ -574,15 +569,16 @@ void Tracking_Reco(int verbosity = 0)
   /// actsTracks assumes some other propagation has already happened
   /// whereas actstrkprop does the propagation
   PHActsTracks *actsTracks = new PHActsTracks();
-  actsTracks->Verbosity(30);
+  actsTracks->Verbosity(0);
   se->registerSubsystem(actsTracks);
 
   PHActsTrkProp *actsProp = new PHActsTrkProp();
-  actsProp->Verbosity(30);
+  actsProp->Verbosity(0);
   //se->registerSubsystem(actsProp);
   
   PHActsTrkFitter *actsFit = new PHActsTrkFitter();
-  actsFit->Verbosity(30);
+  actsFit->Verbosity(0);
+  actsFit->setTimeAnalysis(true);
   se->registerSubsystem(actsFit);
 
   PHGenFitTrkFitter* kalman = new PHGenFitTrkFitter();
