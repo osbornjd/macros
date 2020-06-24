@@ -41,6 +41,7 @@
 #include <trackreco/PHTruthVertexing.h>
 #include <trackreco/PHTruthTrackSeeding.h>
 #include <trackreco/PHGenFitTrackProjection.h>
+#include <trackreco/ActsEvaluator.h>
 
 #include <trackbase/TrkrHitTruthAssoc.h>
 R__LOAD_LIBRARY(libg4tpc.so)
@@ -564,18 +565,21 @@ void Tracking_Reco(int verbosity = 0)
   // Fitting of tracks using Kalman Filter
   //------------------------------------------------
  
-
-  /// Use actsTracks or actsPropagation to prepare for ActsTrkFitter
-  /// actsTracks assumes some other propagation has already happened
-  /// whereas actstrkprop does the propagation
   PHActsTracks *actsTracks = new PHActsTracks();
-  actsTracks->Verbosity(0);
+  actsTracks->Verbosity(0);  
   se->registerSubsystem(actsTracks);
 
+  /// Use either PHActsTrkFitter to run the ACTS
+  /// KF track fitter, or PHActsTrkProp to run the ACTS Combinatorial 
+  /// Kalman Filter which runs track finding and track fitting
+  /// Always run PHActsTracks first to take the SvtxTrack and convert it
+  /// to a form that Acts can process
+
+  /// If you run PHActsTrkProp, disable PHGenFitTrkProp
   PHActsTrkProp *actsProp = new PHActsTrkProp();
   actsProp->Verbosity(0);
   //se->registerSubsystem(actsProp);
-  
+
   PHActsTrkFitter *actsFit = new PHActsTrkFitter();
   actsFit->Verbosity(0);
   actsFit->setTimeAnalysis(true);
@@ -637,6 +641,11 @@ void Tracking_Reco(int verbosity = 0)
   eval->Verbosity(0);
   se->registerSubsystem(eval);
 
+  
+  ActsEvaluator *actsEval = new ActsEvaluator(outputfile+"_acts.root", eval);
+  actsEval->Verbosity(0);
+  se->registerSubsystem(actsEval);
+  
   if (use_primary_vertex)
   {
     // make a second evaluator that records tracks fitted with primary vertex included
