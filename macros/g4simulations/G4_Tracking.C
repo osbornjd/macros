@@ -48,6 +48,7 @@
 #include <trackreco/PHActsTracks.h>
 #include <trackreco/PHActsTrkProp.h>
 #include <trackreco/PHActsTrkFitter.h>
+#include <trackreco/PHVertexFitter.h>
 #include <trackreco/ActsEvaluator.h>
 #endif
 
@@ -109,11 +110,11 @@ const int n_micromegas_layer = 2;
 //=====================================
 const int init_vertexing_min_zvtx_tracks = 2; // PHInitZvertexing parameter for reducing spurious vertices, use 2 for Pythia8 events, 5 for large multiplicity events
 //default seed is PHTpcTracker
-const bool use_hough_seeding = false; //choose seeding algo
+const bool use_hough_seeding = true; //choose seeding algo
 const bool use_ca_seeding  = false;
 
 const bool use_track_prop = true;   // true for normal track seeding, false to run with truth track seeding instead
-const bool useActsFitting = false;  // true to use PHActsTrkFitter, false to use PHGenFitTrkFitter
+const bool useActsFitting = true;  // true to use PHActsTrkFitter, false to use PHGenFitTrkFitter
 const bool g4eval_use_initial_vertex = false;   // if true, g4eval uses initial vertices in SvtxVertexMap, not final vertices in SvtxVertexMapRefit
 const bool use_primary_vertex = false;  // if true, refit tracks with primary vertex included - adds second node to node tree, adds second evaluator and outputs separate ntuples
 
@@ -590,6 +591,7 @@ void Tracking_Reco(int verbosity = 0)
 	tracker->enable_vertexing( false ); // rave vertexing is pretty slow at large multiplicities...
 	se->registerSubsystem(tracker);
       }
+
       // Find all clusters associated with each seed track
       auto track_prop = new PHGenFitTrkProp("PHGenFitTrkProp", n_maps_layer, n_intt_layer, n_gas_layer, enable_micromegas ? n_micromegas_layer:0);
       track_prop->Verbosity(0);
@@ -637,14 +639,19 @@ void Tracking_Reco(int verbosity = 0)
       /// to a form that Acts can process
       
       /// If you run PHActsTrkProp, disable PHGenFitTrkProp
-      //PHActsTrkProp *actsProp = new PHActsTrkProp();
-      //actsProp->Verbosity(0);
+      PHActsTrkProp *actsProp = new PHActsTrkProp();
+      actsProp->Verbosity(0);
       //se->registerSubsystem(actsProp);
       
       PHActsTrkFitter *actsFit = new PHActsTrkFitter();
       actsFit->Verbosity(0);
       actsFit->setTimeAnalysis(true);
       se->registerSubsystem(actsFit);
+
+      PHActsVertexFitter *vtxFit = new PHActsVertexFitter();
+      vtxFit->Verbosity(0);
+      //se->registerSubsystem(vtxFit);
+
       #endif   
     }
   else
