@@ -48,7 +48,7 @@
 #include <trackreco/PHActsTracks.h>
 #include <trackreco/PHActsTrkProp.h>
 #include <trackreco/PHActsTrkFitter.h>
-#include <trackreco/PHVertexFitter.h>
+#include <trackreco/PHActsVertexFitter.h>
 #include <trackreco/ActsEvaluator.h>
 #endif
 
