@@ -516,7 +516,7 @@ void Tracking_Clus(int verbosity = 0)
   
 }
 
-void Tracking_Reco(int verbosity = 0)
+void Tracking_Reco(int verbosity = 0, float qopCov = 0.01)
 {
   // processes the TrkrHits to make clusters, then reconstruct tracks and vertices
 
@@ -595,7 +595,7 @@ void Tracking_Reco(int verbosity = 0)
       // Find all clusters associated with each seed track
       auto track_prop = new PHGenFitTrkProp("PHGenFitTrkProp", n_maps_layer, n_intt_layer, n_gas_layer, enable_micromegas ? n_micromegas_layer:0);
       track_prop->Verbosity(0);
-      se->registerSubsystem(track_prop);
+      //se->registerSubsystem(track_prop);
       for(int i = 0;i<n_intt_layer;i++)
 	{
 	  // strip length is along theta
@@ -641,12 +641,13 @@ void Tracking_Reco(int verbosity = 0)
       /// If you run PHActsTrkProp, disable PHGenFitTrkProp
       PHActsTrkProp *actsProp = new PHActsTrkProp();
       actsProp->Verbosity(0);
-      //se->registerSubsystem(actsProp);
+      actsProp->setQopCov(qopCov);
+      se->registerSubsystem(actsProp);
       
       PHActsTrkFitter *actsFit = new PHActsTrkFitter();
       actsFit->Verbosity(0);
-      actsFit->setTimeAnalysis(true);
-      se->registerSubsystem(actsFit);
+      actsFit->setTimeAnalysis(false);
+      //se->registerSubsystem(actsFit);
 
       PHActsVertexFitter *vtxFit = new PHActsVertexFitter();
       vtxFit->Verbosity(0);
@@ -718,6 +719,7 @@ void Tracking_Reco(int verbosity = 0)
       #if __cplusplus >= 201703L
       ActsEvaluator *actsEval = new ActsEvaluator(outputfile+"_acts.root", eval);
       actsEval->Verbosity(0);
+      actsEval->setEvalCKF(true);
       se->registerSubsystem(actsEval);
       #endif
       }
