@@ -42,6 +42,7 @@
 #include <trackreco/PHTruthVertexing.h>
 #include <trackreco/PHTruthTrackSeeding.h>
 #include <trackreco/PHGenFitTrackProjection.h>
+#include <trackreco/PHCASeeding.h>
 
 #if __cplusplus >= 201703L
 #include <trackreco/PHActsSourceLinks.h>
@@ -110,8 +111,8 @@ const int n_micromegas_layer = 2;
 //=====================================
 const int init_vertexing_min_zvtx_tracks = 2; // PHInitZvertexing parameter for reducing spurious vertices, use 2 for Pythia8 events, 5 for large multiplicity events
 //default seed is PHTpcTracker
-const bool use_hough_seeding = true; //choose seeding algo
-const bool use_ca_seeding  = false;
+const bool use_hough_seeding = false; //choose seeding algo
+const bool use_ca_seeding  = true;
 
 const bool use_track_prop = true;   // true for normal track seeding, false to run with truth track seeding instead
 const bool useActsFitting = true;  // true to use PHActsTrkFitter, false to use PHGenFitTrkFitter
@@ -516,7 +517,10 @@ void Tracking_Clus(int verbosity = 0)
   
 }
 
-void Tracking_Reco(int verbosity = 0, float qopCov = 0.01)
+void Tracking_Reco(int verbosity = 0,
+		   float mvtxChisq = 30.,
+		   float inttChisq = 20.,
+		   float tpcChisq = 15.)
 {
   // processes the TrkrHits to make clusters, then reconstruct tracks and vertices
 
@@ -581,6 +585,8 @@ void Tracking_Reco(int verbosity = 0, float qopCov = 0.01)
 	track_seed->Verbosity(0);
 	se->registerSubsystem(track_seed);
       }else if(use_ca_seeding){
+	auto seeder = new PHCASeeding("PHCASeeding");
+	se->registerSubsystem(seeder);
       }else{
 	PHTpcTracker* tracker = new PHTpcTracker("PHTpcTracker");
 	tracker->set_seed_finder_options( 3.0, M_PI / 8, 10, 6.0, M_PI / 8, 5, 1 ); // two-pass CA seed params
@@ -629,7 +635,7 @@ void Tracking_Reco(int verbosity = 0, float qopCov = 0.01)
     {    
       #if __cplusplus >= 201703L
       PHActsTracks *actsTracks = new PHActsTracks();
-      actsTracks->Verbosity(0);
+      actsTracks->Verbosity(10);
       se->registerSubsystem(actsTracks);
       
       /// Use either PHActsTrkFitter to run the ACTS
@@ -639,14 +645,24 @@ void Tracking_Reco(int verbosity = 0, float qopCov = 0.01)
       /// to a form that Acts can process
       
       /// If you run PHActsTrkProp, disable PHGenFitTrkProp
+      
       PHActsTrkProp *actsProp = new PHActsTrkProp();
-      actsProp->Verbosity(0);
-      actsProp->setQopCov(qopCov);
+      actsProp->Verbosity(10);
+      actsProp->doTimeAnalysis(false);
+      actsProp->resetCovariance(true);
+      actsProp->setVolumeMaxChi2(7,10000); /// MVTX 
+      actsProp->setVolumeMaxChi2(9,10000); /// INTT
+      actsProp->setVolumeMaxChi2(11,10000); /// TPC
+      actsProp->setVolumeLayerMaxChi2(9, 2, 100); /// INTT first few layers
+      actsProp->setVolumeLayerMaxChi2(9, 4, 100);
+      actsProp->setVolumeLayerMaxChi2(11,2, 200); /// TPC first few layers
+      actsProp->setVolumeLayerMaxChi2(11,4,200);
+      
       se->registerSubsystem(actsProp);
       
       PHActsTrkFitter *actsFit = new PHActsTrkFitter();
       actsFit->Verbosity(0);
-      actsFit->setTimeAnalysis(false);
+      actsFit->doTimeAnalysis(false);
       //se->registerSubsystem(actsFit);
 
       PHActsVertexFitter *vtxFit = new PHActsVertexFitter();
