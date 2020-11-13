@@ -24,6 +24,7 @@
 #include <trackreco/PHTrackSeeding.h>
 #include <trackreco/PHTruthSiliconAssociation.h>
 #include <trackreco/PHTruthTrackSeeding.h>
+#include <tpccalib/TpcSpaceChargeReconstruction.h>
 #include <trackreco/PHTruthVertexing.h>
 
 #if __cplusplus >= 201703L
@@ -77,7 +78,7 @@ namespace G4TRACKING
   // Possible variations - these are normally false
   bool use_PHTpcTracker_seeding = false;   // false for using the default PHCASeeding to get TPC track seeds, true to use PHTpcTracker
   bool use_truth_si_matching = false;      // if true, associates silicon clusters using best truth track match to TPC seed tracks - for diagnostics only
-  bool use_truth_track_seeding = false;    // false for normal track seeding, use true to run with truth track seeding instead  ***** WORKS FOR GENFIT ONLY
+  bool use_truth_track_seeding = true;    // false for normal track seeding, use true to run with truth track seeding instead  ***** WORKS FOR GENFIT ONLY
   bool use_Genfit = false;                 // if false, acts KF is run on proto tracks assembled above, if true, use Genfit track propagation and fitting
   bool use_init_vertexing = false;         // false for using smeared truth vertex, set to true to get initial vertex from MVTX hits using PHInitZVertexing
   bool use_primary_vertex = false;         // refit Genfit tracks (only) with primary vertex included - adds second node to node tree, adds second evaluator, outputs separate ntuples
@@ -143,7 +144,7 @@ void TrackingInit()
   }
 }
 
-void Tracking_Reco()
+void Tracking_Reco(const std::string& outputFile)
 {
   int verbosity = std::max(Enable::VERBOSITY, Enable::TRACKING_VERBOSITY);
   // processes the TrkrHits to make clusters, then reconstruct tracks and vertices
@@ -267,7 +268,21 @@ void Tracking_Reco()
     kalman->set_vertexing_method(G4TRACKING::vmethod);
     kalman->set_use_truth_vertex(false);
 
+   
+    
+    std::cout << "Tracking_reco - Disabling TPC layers from kalman filter" << std::endl;
+    for( int layer = 7; layer < 23; ++layer ) { kalman->disable_layer( layer ); }
+    for( int layer = 23; layer < 39; ++layer ) { kalman->disable_layer( layer ); }
+    for( int layer = 39; layer < 55; ++layer ) { kalman->disable_layer( layer ); }
+    
+
     se->registerSubsystem(kalman);
+
+    auto spaceChargeReconstruction = new TpcSpaceChargeReconstruction;
+    spaceChargeReconstruction->set_use_micromegas( true );
+    spaceChargeReconstruction->set_outputfile( outputFile );
+    // spaceChargeReconstruction->Verbosity(1);
+    se->registerSubsystem( spaceChargeReconstruction );
 
   }
   
@@ -396,6 +411,7 @@ void Tracking_Reco()
 	  /// run tpc residual determination with silicon+MM track fit
 	  PHTpcResiduals *residuals = new PHTpcResiduals();
 	  residuals->Verbosity(0);
+	  residuals->setOutputfile(outputFile);
 	  se->registerSubsystem(residuals);
 
 	}
