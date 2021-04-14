@@ -40,6 +40,7 @@
 #include <trackreco/PHActsInitialVertexFinder.h>
 #include <trackreco/PHActsVertexFinder.h>
 #include <trackreco/PHTpcResiduals.h>
+#include <trackreco/PHActsVertexFitter.h>
 #endif
 
 #include <trackbase/TrkrHitTruthAssoc.h>
@@ -92,7 +93,7 @@ namespace G4TRACKING
   bool use_truth_track_seeding = false;    // false for normal track seeding, use true to run with truth track seeding instead  ***** WORKS FOR GENFIT ONLY
   bool use_Genfit = false;                 // if false, acts KF is run on proto tracks assembled above, if true, use Genfit track propagation and fitting
   bool use_acts_silicon_seeding = true;   // if true runs acts silicon seeding
-  bool use_acts_init_vertexing = false;    // if true runs acts initial vertex finder, false runs truth vertexing
+  bool use_acts_init_vertexing = true;    // if true runs acts initial vertex finder, false runs truth vertexing
   bool use_phinit_vertexing = false && !use_acts_init_vertexing;         // false for using smeared truth vertex, set to true to get initial vertex from MVTX hits using PHInitZVertexing
   bool use_rave_vertexing = true;          // Use Rave to find and fit for vertex after track fitting
   bool use_primary_vertex = false;         // refit Genfit tracks (only) with primary vertex included - adds second node to node tree, adds second evaluator, outputs separate ntuples
@@ -472,10 +473,13 @@ void Tracking_Reco()
       se->registerSubsystem(residuals);
     }
 
+    PHActsVertexFitter *fitter = new PHActsVertexFitter();
+    fitter->Verbosity(4);
+    se->registerSubsystem(fitter);
 
     PHActsVertexFinder *finder = new PHActsVertexFinder();
     finder->Verbosity(verbosity);
-    se->registerSubsystem(finder);
+    //se->registerSubsystem(finder);
 
     PHActsTrkFitter* actsFit2 = new PHActsTrkFitter("PHActsSecondTrKFitter");
     actsFit2->Verbosity(verbosity);
