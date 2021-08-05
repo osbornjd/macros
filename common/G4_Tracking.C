@@ -107,7 +107,7 @@ namespace G4TRACKING
   bool use_full_truth_track_seeding = false;  // makes track seeds using truth info, used for both Acts and Genfit
 
   // Rave final vertexing (for QA)
-  bool use_rave_vertexing = true;                     // Use Rave to find and fit for vertex after track fitting - used for QA only
+  bool use_rave_vertexing = false;                     // Use Rave to find and fit for vertex after track fitting - used for QA only
   // This is the setup we have been using  - smeared truth vertex for a single collision per event. Make it the default for now.
   std::string vmethod("avf-smoothing:1");  // only good for 1 vertex events // vmethod is a string used to set the Rave final-vertexing method:
 
@@ -249,8 +249,8 @@ void Tracking_Reco()
   else
     {
       PHActsInitialVertexFinder* init_vtx = new PHActsInitialVertexFinder();
-      init_vtx->Verbosity(verbosity);
-      init_vtx->setSvtxTrackMapName("SvtxSiliconTrackMap");
+      init_vtx->Verbosity(4);
+      init_vtx->setSvtxTrackMapName("SvtxTrackMap");
       init_vtx->setSvtxVertexMapName("SvtxVertexMap");
       se->registerSubsystem(init_vtx);
     }
@@ -320,13 +320,13 @@ void Tracking_Reco()
 	      else seeder->SetMinClustersPerTrack(20);
 	      seeder->useConstBField(false);
 	      seeder->useFixedClusterError(true);
-	      se->registerSubsystem(seeder);
+	      //se->registerSubsystem(seeder);
 
 	      if(G4TRACKING::use_propagator)
 	      {
 	        PHTpcTrackSeedVertexAssoc* vtxassoc2 = new PHTpcTrackSeedVertexAssoc("PrePropagatorPHTpcTrackSeedVertexAssoc");
 	        vtxassoc2->Verbosity(verbosity);
-	        se->registerSubsystem(vtxassoc2);
+	        //se->registerSubsystem(vtxassoc2);
 
 	        std::cout << "   Using PHSimpleKFProp propagator " << std::endl;
 	        PHSimpleKFProp* cprop = new PHSimpleKFProp("PHSimpleKFProp");
@@ -335,7 +335,7 @@ void Tracking_Reco()
 	        cprop->useFixedClusterError(true);
 	        cprop->set_max_window(5.);
 	        cprop->Verbosity(verbosity);
-	        se->registerSubsystem(cprop);
+	        //se->registerSubsystem(cprop);
 	      }
 	    }
 	}
@@ -347,7 +347,7 @@ void Tracking_Reco()
       // It refines the phi and eta of the TPC tracklet prior to matching with the silicon tracklet
       PHTpcTrackSeedVertexAssoc *vtxassoc = new PHTpcTrackSeedVertexAssoc();
       vtxassoc->Verbosity(verbosity);
-      se->registerSubsystem(vtxassoc);
+      //se->registerSubsystem(vtxassoc);
       
       // Silicon cluster matching to TPC track seeds
       if (G4TRACKING::use_truth_si_matching)
@@ -387,7 +387,7 @@ void Tracking_Reco()
 	      silicon_match->set_eta_search_window(0.005);
 	    }
 	  silicon_match->set_test_windows_printout(false);  // used for tuning search windows only
-	  se->registerSubsystem(silicon_match);
+	  //se->registerSubsystem(silicon_match);
 	}
       
       // Associate Micromegas clusters with the tracks
@@ -419,7 +419,7 @@ void Tracking_Reco()
 	    }
 	  mm_match->set_min_tpc_layer(38);             // layer in TPC to start projection fit
 	  mm_match->set_test_windows_printout(false);  // used for tuning search windows only
-	  se->registerSubsystem(mm_match);
+	  //se->registerSubsystem(mm_match);
 	}
 
       // Final fitting of tracks using Acts Kalman Filter
@@ -432,7 +432,7 @@ void Tracking_Reco()
       actsFit->doTimeAnalysis(false);
       /// If running with distortions, fit only the silicon+MMs first
       actsFit->fitSiliconMMs(G4TRACKING::SC_CALIBMODE);
-      se->registerSubsystem(actsFit);
+      //se->registerSubsystem(actsFit);
       
       if (G4TRACKING::SC_CALIBMODE)
 	{
@@ -446,17 +446,17 @@ void Tracking_Reco()
       // Choose the best silicon matched track for each TPC track seed
       PHTrackCleaner *cleaner= new PHTrackCleaner();
       cleaner->Verbosity(verbosity);
-      se->registerSubsystem(cleaner);
+      //se->registerSubsystem(cleaner);
       
       PHActsVertexFinder *finder = new PHActsVertexFinder();
       finder->Verbosity(verbosity);
-      se->registerSubsystem(finder);
+      //se->registerSubsystem(finder);
       
       PHActsTrkFitter* actsFit2 = new PHActsTrkFitter("PHActsSecondTrKFitter");
       actsFit2->Verbosity(verbosity);
       actsFit2->doTimeAnalysis(false);
       actsFit2->fitSiliconMMs(false);
-      se->registerSubsystem(actsFit2);
+      //se->registerSubsystem(actsFit2);
     }
 
   //=========================================================    
@@ -640,7 +640,7 @@ void Tracking_Reco()
   //===============
   PHGenFitTrackProjection* projection = new PHGenFitTrackProjection();
   projection->Verbosity(verbosity);
-  se->registerSubsystem(projection);
+  //se->registerSubsystem(projection);
   
   return;
 }
