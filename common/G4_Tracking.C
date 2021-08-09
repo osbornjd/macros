@@ -23,6 +23,7 @@
 #include <trackreco/PHMicromegasTpcTrackMatching.h>
 #include <trackreco/PHRaveVertexing.h>
 #include <trackreco/PHSiliconTpcTrackMatching.h>
+#include <trackreco/PHActsSiliconSeedCleaner.h>
 #include <trackreco/PHTpcTrackSeedVertexAssoc.h>
 #include <trackreco/PHTrackCleaner.h>
 #include <trackreco/PHTrackSeeding.h>
@@ -90,6 +91,9 @@ namespace G4TRACKING
   // Initial vertexing
   bool g4eval_use_initial_vertex = true;  // if true, g4eval uses initial vertices in SvtxVertexMap, not final vertices in SvtxVertexMapRefit
   bool use_truth_init_vertexing = false;    // if true runs truth vertexing, if false runs acts initial vertex finder
+
+  // Silicon seeding options
+  bool use_silicon_seed_cleaner = true; // true to run silicon seed removing
 
   // TPC seeding options
   bool use_PHTpcTracker_seeding = false;  // false for using the default PHCASeeding to get TPC track seeds, true to use PHTpcTracker
@@ -235,6 +239,13 @@ void Tracking_Reco()
       PHActsSiliconSeeding* silicon_Seeding = new PHActsSiliconSeeding();
       silicon_Seeding->Verbosity(verbosity);
       se->registerSubsystem(silicon_Seeding);
+      
+      if(G4TRACKING::use_silicon_seed_cleaner)
+	{
+	  PHActsSiliconSeedCleaner *cleaner = new PHActsSiliconSeedCleaner();
+	  cleaner->Verbosity(verbosity);
+	  se->registerSubsystem(cleaner);
+	}
     }
   
   // Initial vertex finding
