@@ -37,7 +37,7 @@ R__LOAD_LIBRARY(libcalibCaloEmc_pi0.so)
 // For HepMC Hijing
 // try inputFile = /sphenix/sim/sim01/sphnxpro/sHijing_HepMC/sHijing_0-12fm.dat
 
-int Fun4All_pi0_SIMPLE_EMBED_JF(
+int Fun4All_pi0tbt_SIMPLE_EMBED(
     const int nEvents = 3,
 		const int mdc2_4_file_num = 1,
     const string &outputFile = "out_jan23.root",
@@ -47,9 +47,9 @@ int Fun4All_pi0_SIMPLE_EMBED_JF(
   Fun4AllServer *se = Fun4AllServer::instance();
   se->Verbosity(0);
 
-	string inputFile0 = "DST_CALO_G4HIT_sHijing_0_20fm_50kHz_bkg_0_20fm-0000000060-";
-  string inputFile1 = "DST_VERTEX_sHijing_0_20fm_50kHz_bkg_0_20fm-0000000060-";
-	string inputFile2 = "DST_TRUTH_sHijing_0_20fm_50kHz_bkg_0_20fm-0000000060-";
+	string inputFile0 = "DST_CALO_G4HIT_sHijing_0_20fm_50kHz_bkg_0_20fm-0000000062-";
+  string inputFile1 = "DST_VERTEX_sHijing_0_20fm_50kHz_bkg_0_20fm-0000000062-";
+	string inputFile2 = "DST_TRUTH_sHijing_0_20fm_50kHz_bkg_0_20fm-0000000062-";
 
 
 	int ynum_int = 100000+ mdc2_4_file_num;
@@ -119,7 +119,7 @@ int Fun4All_pi0_SIMPLE_EMBED_JF(
       INPUTGENERATOR::SimpleEventGenerator[0]->set_vertex_distribution_mean(0., 0., 0.);
       INPUTGENERATOR::SimpleEventGenerator[0]->set_vertex_distribution_width(0.01, 0.01, 5.);
     }
-    INPUTGENERATOR::SimpleEventGenerator[0]->set_eta_range(-0.3, 0.3);
+    INPUTGENERATOR::SimpleEventGenerator[0]->set_eta_range(-1.1, 1.1);
     INPUTGENERATOR::SimpleEventGenerator[0]->set_phi_range(-M_PI, M_PI);
     INPUTGENERATOR::SimpleEventGenerator[0]->set_pt_range(1.6, 5.);
     INPUTGENERATOR::SimpleEventGenerator[0]->set_power_law_n(-6.5);
