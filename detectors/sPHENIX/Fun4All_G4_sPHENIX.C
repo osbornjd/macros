@@ -41,6 +41,10 @@ R__LOAD_LIBRARY(libffamodules.so)
 
 int Fun4All_G4_sPHENIX(
     const int nEvents = 1,
+    const unsigned int mvtxMisalignment = 100,
+    const unsigned int inttMisalignment = 100,
+    const unsigned int tpcMisalignment = 1000,
+    const unsigned int tpotMisalignment = 100,
     const string &inputFile = "https://www.phenix.bnl.gov/WWW/publish/phnxbld/sPHENIX/files/sPHENIX_G4Hits_sHijing_9-11fm_00000_00010.root",
     const string &outputFile = "G4sPHENIX.root",
     const string &embed_input_file = "https://www.phenix.bnl.gov/WWW/publish/phnxbld/sPHENIX/files/sPHENIX_G4Hits_sHijing_9-11fm_00000_00010.root",
@@ -310,6 +314,10 @@ int Fun4All_G4_sPHENIX(
   Enable::TRACKING_EVAL = Enable::TRACKING_TRACK && true;
   Enable::TRACKING_QA = Enable::TRACKING_TRACK && Enable::QA && true;
   G4TRACKING::use_alignment = true;
+  ACTSGEOM::mvtxMisalignment = mvtxMisalignment;
+  ACTSGEOM::inttMisalignment = inttMisalignment;
+  ACTSGEOM::tpcMisalignment = tpcMisalignment;
+  ACTSGEOM::tpotMisalignment = tpotMisalignment;
 
   //  cemc electronics + thin layer of W-epoxy to get albedo from cemc
   //  into the tracking, cannot run together with CEMC
