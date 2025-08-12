@@ -121,7 +121,7 @@ void Fun4All_FullReconstruction(
   std::string geofile = CDBInterface::instance()->getUrl("Tracking_Geometry");
 
   Fun4AllRunNodeInputManager *ingeo = new Fun4AllRunNodeInputManager("GeoIn");
-  ingeo->AddFile(geofile);
+  ingeo->AddFile("/sphenix/user/jdosbo/calibrations/RecoGeom_50ns1025tbin_chanmapv3.root");
   se->registerInputManager(ingeo);
 
   TpcReadoutInit( runnumber );
@@ -167,10 +167,7 @@ void Fun4All_FullReconstruction(
 
   Micromegas_HitUnpacking();
 
-  MvtxClusterizer* mvtxclusterizer = new MvtxClusterizer("MvtxClusterizer");
-  int verbosity = std::max(Enable::VERBOSITY, Enable::MVTX_VERBOSITY);
-  mvtxclusterizer->Verbosity(verbosity);
-  se->registerSubsystem(mvtxclusterizer);
+  Mvtx_Clustering();
 
   Intt_Clustering();
 
